@@ -1,14 +1,23 @@
 import importlib.util
-from pathlib import Path
-import unittest
 import json
 import subprocess
 import sys
+import unittest
+from pathlib import Path
 
 path = Path(__file__).resolve().parents[1] / "skills/scrum-skill/scripts/route_invocation.py"
 spec = importlib.util.spec_from_file_location("invocation", path)
 router = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(router)
+
+
+def run_cli(*arguments: str, input_text: str | None = None) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(path), *arguments],
+        input=input_text,
+        capture_output=True,
+        text=True,
+    )
 
 
 class InvocationTests(unittest.TestCase):
@@ -73,10 +82,47 @@ class InvocationTests(unittest.TestCase):
 
     def test_cli_stdin_preserves_quoted_windows_target(self):
         request = r'role legal review --target "C:\work\my garden\ci.yml"'
-        result = subprocess.run([sys.executable, str(path), "--stdin"], input=request,
-                                capture_output=True, text=True, check=True)
+        result = run_cli("--stdin", input_text=request)
+        self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
         self.assertEqual(data["options"]["target"], r"C:\work\my garden\ci.yml")
+
+    def test_cli_empty_request_returns_parseable_wizard_intent(self):
+        result = run_cli("")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["mode"], "wizard")
+        self.assertFalse(data["executes_actions"])
+
+    def test_cli_preserves_quoted_goal_target_and_shell_looking_data(self):
+        request = r'setup --goal "$(whoami); harmless text" --target "C:\work\my garden\ci.yml"'
+
+        result = run_cli(request)
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["options"]["goal"], "$(whoami); harmless text")
+        self.assertEqual(data["options"]["target"], r"C:\work\my garden\ci.yml")
+        self.assertNotIn("whoami", result.stderr)
+
+    def test_cli_rejects_invalid_role_mode_and_flag_without_traceback(self):
+        requests = ["role enginer review", "role design deploy", "plan --unknown x"]
+
+        for request in requests:
+            with self.subTest(request=request):
+                result = run_cli(request)
+
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("scrum-skill routing:", result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+
+    def test_cli_rejects_multiple_argument_strings(self):
+        result = run_cli("plan", "--goal", "one")
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("one quoted invocation argument string", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":
