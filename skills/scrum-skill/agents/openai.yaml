@@ -1,0 +1,6 @@
+interface:
+  display_name: "Scrum Skill"
+  short_description: "Coordinate Scrum artifacts and AI teammates"
+  default_prompt: "Use $scrum-skill to set up or resume a project with evidence-backed Scrum artifacts and an adaptable AI team."
+policy:
+  allow_implicit_invocation: true

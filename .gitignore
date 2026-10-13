@@ -1,0 +1,14 @@
+# Local project state and evaluation evidence must not ship.
+.scrum/
+private/
+.eval-output/
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+dist/

@@ -1,0 +1,20 @@
+{
+  "name": "scrum-skills",
+  "interface": {
+    "displayName": "Scrum Skills"
+  },
+  "plugins": [
+    {
+      "name": "scrum-skill",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

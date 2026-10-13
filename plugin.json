@@ -1,0 +1,7 @@
+{
+  "name": "scrum-skill",
+  "version": "0.1.0",
+  "description": "Project-neutral Scrum coordination, artifacts and adaptable AI teammates.",
+  "license": "MIT",
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+}
