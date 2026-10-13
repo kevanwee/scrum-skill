@@ -15,7 +15,8 @@ facilitation or demonstrate a live installed conversation on every host.
   conflicting identity, dry runs, custom roles, malformed pointer blocks, path
   collisions, symlink escape, date limits and repair from existing project decisions.
   Windows passes seventeen and skips the symlink test when privilege is unavailable.
-  Linux CI exercises the same suite, including symlink behavior.
+  [Linux CI](https://github.com/kevanwee/scrum-skill/actions/runs/38339579380)
+  passed all eighteen tests on Python 3.10 and 3.14, including symlink behavior.
 - Five README Mermaid diagrams rendered with Mermaid CLI 11.12.0 and inspected
   for syntax, readable labels and layout.
 - No paid model calls, telemetry, external project messages or production deployment.
